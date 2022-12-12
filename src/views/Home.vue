@@ -11,14 +11,16 @@ export default {
     const store = useStore();
     const city = ref('taipei')
     const init = ()=>{
-      store.dispatch('getWeather');
+      store.dispatch('getWeather',city.value);
     }
     const getWeatherData = computed(()=>{
       return store.getters.weatherData;
     })
     const search = ()=>{
       store.dispatch('setLoading', 1)
-      store.dispatch('getWoeid',city.value);
+      // store.dispatch('getWoeid',city.value);
+      store.dispatch('getWeather',city.value);
+      store.dispatch('setCity',city.value);
     }
     const getCity = ()=>{
       return store.getters.getCity;
@@ -43,7 +45,9 @@ export default {
     <div>City:<input v-model="city"/><button @click="search">Search</button></div>
     <div class="chart" v-show="getLoading() == 2">
       <h2>{{getCity()}}</h2>
-      <Weather v-bind:obj="item" v-for="(item, idx) in getWeatherData" :key="item.id"/>      
+
+      <Weather v-bind:obj="item" v-for="(item, idx) in getWeatherData" :key="item"/>    
+        
     </div>
     <p v-show="getLoading() == 0">No results</p>
     <br>    

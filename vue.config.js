@@ -8,7 +8,7 @@ module.exports = {
     //以上的ip和埠號是我們本機的;下面為需要跨域的
     proxy: {    //配置跨域
       '/weatherapi': {
-        target: 'https://www.metaweather.com',
+        target: 'http://api.weatherapi.com',
         ws: true,     // 如果要代理 websockets
         changOrigin: true,  //允許跨域
         pathRewrite: {

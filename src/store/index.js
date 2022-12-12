@@ -10,11 +10,14 @@ export default createStore({
   },
   actions: {
     getWoeid(context,city){
+      const cros = 'https://api.allorigins.win/get?url=';
+      const url = encodeURIComponent(`https://www.metaweather.com/api/location/search/?query=${city}`);      
       axios
-      .get(`/weatherapi/api/location/search/?query=${city}`)
-      .then((res)=>{        
-        if(res.data.length > 0){
-          context.commit('setWoeidCity',{city:city,woeid:res.data[0].woeid});
+      .get(`${cros}${url}`)
+      .then((res)=>{
+        var ndata = JSON.parse(res.data.contents)
+        if(ndata.length > 0){
+          context.commit('setWoeidCity',{city:city,woeid:ndata[0].woeid});
           context.dispatch('getWeather');
         }else{
           context.dispatch('setLoading', 0);
@@ -24,11 +27,16 @@ export default createStore({
         console.log(error);
       })
     },
-    getWeather(context){
+    getWeather(context,city){
+      const cros = 'https://api.allorigins.win/get?url=';
+      const days = 5;
+      //const url = encodeURIComponent(`https://www.metaweather.com/api/location/${context.state.woeid}/`);
+      const url = encodeURIComponent(`http://api.weatherapi.com/v1/forecast.json?key=8489f71e06bd446496132942221212&q=${city}&days=${days}&aqi=no&alerts=no`);      
       axios
-      .get(`/weatherapi/api/location/${context.state.woeid}/`)
-      .then((res)=>{        
-        context.commit('addWeatherData',res.data.consolidated_weather);
+      .get(`${cros}${url}`)
+      .then((res)=>{                
+        var ndata = JSON.parse(res.data.contents);        
+        context.commit('addWeatherData', ndata.forecast.forecastday);
       })
       .catch(function (error) {        
         console.log(error);
@@ -36,7 +44,10 @@ export default createStore({
     },
     setLoading(context,load){
       context.commit('setLoading',load);
-    }
+    },
+    setCity(context,val){
+      context.commit('setCity',val);
+    },
   },
   mutations: {
     addWeatherData(state,data){
@@ -49,6 +60,9 @@ export default createStore({
     },
     setLoading(state, load){
       state.loading = load;
+    },
+    setCity(state, val){
+      state.city = val;
     }
   },
   getters:{

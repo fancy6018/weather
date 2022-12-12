@@ -4,10 +4,10 @@
     <div class="barbox">
       <div class="square">
         <div class="max" :style="{'--temp_max':temp_max,'--temp_max_h':temp_max_h}">
-          <span>{{temp_max}}</span>
+          <span>{{temp_max}}°C</span>
         </div>
         <div class="min" :style="{'--temp_min':temp_min,'--temp_min_h':temp_min_h}">
-          <span>{{temp_min}}</span>
+          <span>{{temp_min}}°C</span>
         </div>
       </div>
       <span class="icon_max"><i></i> max temp</span>      
@@ -15,10 +15,10 @@
     </div>
     <div class="piebox"> 
       <div class="piebg">
-        <div class="pie" :style="{'--deg':deg,'--pieAfter':pieAfter,'--pieW':pieW,'--pieMl':pieMl}">              
+        <div class="pie" v-show="num > 0" :style="{'--deg':deg,'--pieAfter':pieAfter,'--pieW':pieW,'--pieMl':pieMl}">              
         </div>            
       </div>
-      <p>humidity <i class="icon_humidity"></i>{{obj.humidity}}%</p>
+      <p>humidity <i class="icon_humidity"></i>{{obj.day.avghumidity || 'Not found'}}%</p>
     </div>
   </div>
 </template>
@@ -26,17 +26,17 @@
 <script>
 export default {  
   props: ['obj'],
-  setup(props){
-    const temp_max = props.obj.max_temp.toFixed(2);
-    const temp_min = props.obj.min_temp.toFixed(2);
+  setup(props){    
+    const temp_max = props.obj.day.maxtemp_c.toFixed(1);
+    const temp_min = props.obj.day.mintemp_c.toFixed(1);
     const temp_max_h = `${temp_max*2}px`;
     const temp_min_h = `${temp_min*2}px`;
-    const num = (Math.round(parseInt(props.obj.humidity)*3.6));    
+    const num = (Math.round(parseInt(props.obj.day.avghumidity)*3.6)) || 0;        
     const deg = `rotate(${num-90}deg)`;
     const pieAfter = num < 180 ? 0 : 1;
     const pieW = num < 180 ? '50px' : '100px';
-    const pieMl = num < 180 ? '50px' : 0;
-    return { deg, pieAfter ,pieW ,pieMl, temp_max, temp_min,temp_max_h,temp_min_h}
+    const pieMl = num < 180 ? '50px' : 0;    
+    return { num, deg, pieAfter ,pieW ,pieMl, temp_max, temp_min,temp_max_h,temp_min_h}
   }
 }
 </script>
@@ -49,6 +49,8 @@ export default {
     background: rgb(222, 247, 247);
     border-radius: 20px;
     padding:0 50px;
+    padding: 0 10px 0 50px;
+    width: 370px;
   }
   .date{
     display: block;
@@ -105,7 +107,7 @@ export default {
     height:var(--temp_min_h);
     position:absolute;
     bottom: 0;
-    left: 60px;
+    left: 70px;
     max-width: 100px;
     min-width: 0px;
   }
@@ -163,7 +165,7 @@ export default {
   } 
   .icon_max{
     position: absolute;
-    right: 0px;
+    right: -3px;
     top: 30px;
   }
   .icon_max i{
@@ -174,7 +176,7 @@ export default {
   }
   .icon_min{
     position: absolute;
-    right: 3px;
+    right: 0px;
     top: 60px;
   }
   .icon_min i{
